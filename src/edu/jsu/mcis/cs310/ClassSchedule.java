@@ -2,6 +2,8 @@
 Darius Foster
 CS 310
 */
+
+//Had a heatstroke on Staurday, so I wasn't done on time.
 package edu.jsu.mcis.cs310;
 
 import com.github.cliftonlabs.json_simple.*;
@@ -35,17 +37,21 @@ public class ClassSchedule {
     private final String SCHEDULE_COL_HEADER = "schedule";
     private final String INSTRUCTOR_COL_HEADER = "instructor";
     private final String SUBJECTID_COL_HEADER = "subjectid";
-    
+   
     //----------------------------------------------------
     public String convertCsvToJsonString(List<String[]> csv){
         Iterator<String[]>CSVIterator=csv.iterator();
-        if (CSVIterator.hasNext()){String[] heads=CSVIterator.next();
+        //Uses the iterator to iterate throug the CSV Strings
+        
+        if (CSVIterator.hasNext())
+            {String[] heads=CSVIterator.next();
             /*
             9/18/2024
             */
             HashMap<String, Integer> headerMap=new HashMap<>();
+            //Uses the HashMap to stroe 
             //-------------------------------------------------
-            for (int i = 0; i < heads.length; i++){
+            for(int i = 0; i < heads.length; i++){
                 //Stores headers in hashmap.
                 headerMap.put(heads[i], i);}
            //---------------------------------------------------
@@ -54,9 +60,9 @@ public class ClassSchedule {
             JsonObject CourseMap=new JsonObject();
             JsonArray jsonArray=new JsonArray();
             //----------------------------------------------------
-            while (CSVIterator.hasNext()){
-                String[] row=CSVIterator.next();
-                
+            while(CSVIterator.hasNext()){
+                String[]row=CSVIterator.next();
+            
                 //-----------------------------------------------
                 
                 String type=row[headerMap.get(TYPE_COL_HEADER)];
@@ -64,29 +70,28 @@ public class ClassSchedule {
                 
                 //-----------------------------------
                 if (TypeMap.get(type)==null){
-                    TypeMap.put(type, schedule);}
+                    TypeMap.put(type,schedule);}
                 //--------------------------------------
                 String subjectId=row[headerMap.get(NUM_COL_HEADER)].replaceAll("\\d", "").replaceAll("\\s", "");
                 
                 
-                if (SubjectsMap.get(subjectId)==null) {
+                if(SubjectsMap.get(subjectId)==null){
                     String subjectHeader=row[headerMap.get(SUBJECT_COL_HEADER)];
                     SubjectsMap.put(subjectId, subjectHeader);}
                  //------------------------------------------------
                 String num=row[headerMap.get(NUM_COL_HEADER)];
-                String numRemoveCaps=num.replaceAll("[A-Z]", "").replaceAll("\\s", "");
+                String numRemoveCaps=num.replaceAll("[A-Z]","").replaceAll("\\s","");
                 //--------------------------------------------------------------
-                if (CourseMap.get(num)==null) {
+                if(CourseMap.get(num)==null){
                     String description=row[headerMap.get(DESCRIPTION_COL_HEADER)];
-                    int credits = Integer.parseInt(row[headerMap.get(CREDITS_COL_HEADER)]);
+                    int credits=Integer.parseInt(row[headerMap.get(CREDITS_COL_HEADER)]);
                 //--------------------------------------------------------------
                     JsonObject course=new JsonObject();
-                    course.put(SUBJECTID_COL_HEADER, subjectId);
-                        course.put(NUM_COL_HEADER, numRemoveCaps);
-                            course.put(DESCRIPTION_COL_HEADER, description);
-                                course.put(CREDITS_COL_HEADER, credits);
-                    CourseMap.put(num, course);
-                }
+                    course.put(SUBJECTID_COL_HEADER,subjectId);
+                        course.put(NUM_COL_HEADER,numRemoveCaps);
+                            course.put(DESCRIPTION_COL_HEADER,description);
+                                course.put(CREDITS_COL_HEADER,credits);
+                    CourseMap.put(num, course);}
                 int crn=Integer.parseInt(row[headerMap.get(CRN_COL_HEADER)]);
                 //------:------\\
                 String sectionHeader=row[headerMap.get(SECTION_COL_HEADER)];
@@ -103,41 +108,42 @@ public class ClassSchedule {
                 
                 //---------------------------------------------------------
                 List<String> instructors=Arrays.asList(allInstructors.split(", "));
-                /*Needed*/
-                //---------------------------------------------------------
-                JsonArray instructorArray=new JsonArray();
+                /*Reads through instructors with the comma dividing them. For instance
+                *("Mike Tenya, Omari Hart) and the (", ") is the space between them.                */
                 
-                for (String instructor : instructors){
-                    instructorArray.add(instructor);}
+                //---------------------------------------------------------
+                JsonArray instructorsArray=new JsonArray();
+                
+                for(String instructor:instructors){
+                    instructorsArray.add(instructor);}
                 
                 JsonObject sectionInfo=new JsonObject();
                     sectionInfo.put(CRN_COL_HEADER, crn);
                         sectionInfo.put(SECTION_COL_HEADER, sectionHeader);
                             sectionInfo.put(START_COL_HEADER, start);
                                 sectionInfo.put(END_COL_HEADER, end);
-                sectionInfo.put(DAYS_COL_HEADER, days);
-                    sectionInfo.put(WHERE_COL_HEADER, where);
-                        sectionInfo.put(INSTRUCTOR_COL_HEADER, instructorArray);
-                            sectionInfo.put(NUM_COL_HEADER, numRemoveCaps);
-                                sectionInfo.put(TYPE_COL_HEADER, type);
-                    sectionInfo.put(SUBJECTID_COL_HEADER, subjectId);
+                sectionInfo.put(DAYS_COL_HEADER,days);
+                    sectionInfo.put(WHERE_COL_HEADER,where);
+                        sectionInfo.put(INSTRUCTOR_COL_HEADER,instructorsArray);
+                            sectionInfo.put(NUM_COL_HEADER,numRemoveCaps);
+                                sectionInfo.put(TYPE_COL_HEADER,type);
+                    sectionInfo.put(SUBJECTID_COL_HEADER,subjectId);
                 jsonArray.add(sectionInfo);}
-            
+            //-------------------------------------------
             JsonObject courseListMap=new JsonObject();
-            courseListMap.put("scheduletype", TypeMap);
-            courseListMap.put("subject", SubjectsMap);
-            courseListMap.put("course", CourseMap);
-            courseListMap.put("section", jsonArray);
+            courseListMap.put("scheduletype",TypeMap);
+            courseListMap.put("subject",SubjectsMap);
+            courseListMap.put("course",CourseMap);
+            courseListMap.put("section",jsonArray);
             //-------------------------------------------------------
-            return Jsoner.serialize(courseListMap);
-        }
-        return "";
-    }
+            return Jsoner.serialize(courseListMap);}
+        return " ";}
     //----------------------------------------------------------------------------
     public String convertJsonToCsvString(JsonObject json){
         StringWriter writer=new StringWriter();
         CSVWriter csvwriter=new CSVWriter(writer, '\t', '"', '\\', "\n");
-        String[] header={CRN_COL_HEADER, 
+        //----------------------------------------------------------
+        String[]header={CRN_COL_HEADER, 
             SUBJECT_COL_HEADER, 
             NUM_COL_HEADER, 
             DESCRIPTION_COL_HEADER, 
@@ -152,15 +158,16 @@ public class ClassSchedule {
             INSTRUCTOR_COL_HEADER};
         //---------------------------------------------------
         csvwriter.writeNext(header);
-        JsonObject scheduleTypeMap=(JsonObject)json.get("scheduletype");
-        JsonObject subjectMap=(JsonObject)json.get("subject");
-        JsonObject courseMap=(JsonObject)json.get("course");
-        JsonArray sectionArray=(JsonArray)json.get("section");
-        for (int i=0; i < sectionArray.size(); i++){
-            JsonObject sectionDetails=sectionArray.getMap(i);
+        JsonObject TypeMap=(JsonObject)json.get("scheduletype");
+        JsonObject SubjectMap=(JsonObject)json.get("subject");
+        JsonObject CourseMap=(JsonObject)json.get("course");
+        JsonArray jsonArray=(JsonArray)json.get("section");
+        
+        for(int i=0;i<jsonArray.size();i++){JsonObject sectionDetails=jsonArray.getMap(i);
+            
             String crn=String.valueOf(sectionDetails.get(CRN_COL_HEADER));
             String subjectId=(String)sectionDetails.get(SUBJECTID_COL_HEADER);
-            String num=subjectId + " " + sectionDetails.get(NUM_COL_HEADER);
+            String num=subjectId+" "+sectionDetails.get(NUM_COL_HEADER);
             String section=(String)sectionDetails.get(SECTION_COL_HEADER);
             String type=(String)sectionDetails.get(TYPE_COL_HEADER);
             String start=(String)sectionDetails.get(START_COL_HEADER);
@@ -170,26 +177,21 @@ public class ClassSchedule {
             
             JsonArray instructorArray=(JsonArray)sectionDetails.get(INSTRUCTOR_COL_HEADER);
             StringBuilder instructorBuilder=new StringBuilder();
-            for (int j=0; j < instructorArray.size(); j++){
+            for (int j=0;j < instructorArray.size();j++){
                 instructorBuilder.append(instructorArray.getString(j));
-                if (j < instructorArray.size()-1){
-                    instructorBuilder.append(", ");
-                }
-            }
+                if (j<instructorArray.size()-1){instructorBuilder.append(", ");}}
+            
              String instructor=instructorBuilder.toString();
-             String schedule=(String)scheduleTypeMap.get(type);
+             String schedule=(String)TypeMap.get(type);
              
-            JsonObject courseDetails=(JsonObject)courseMap.get(num);
+            JsonObject courseDetails=(JsonObject)CourseMap.get(num);
             String description=(String)courseDetails.get(DESCRIPTION_COL_HEADER);
             String credits=String.valueOf(courseDetails.get(CREDITS_COL_HEADER));
+            String SubjectName=(String)SubjectMap.get(subjectId);
             
-            String subjectName=(String)subjectMap.get(subjectId);
-            
-             String[] record={crn, subjectName, num, description, section, type, credits, start, end, days, where, schedule, instructor};
-            csvwriter.writeNext(record);
-        }
-        return writer.toString();      
-    }
+            String[] record={crn, SubjectName, num, description, section, type, credits, start, end, days, where, schedule, instructor};
+            csvwriter.writeNext(record);}
+        return writer.toString();}
     
     //------------------------------------------------------------------------------------
     public JsonObject getJson() {
